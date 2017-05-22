@@ -1,15 +1,16 @@
+{% extends base.html %}
+
 <html>
   <body>
-    <p><h3> {{ text }}</h3></p>
-    <form method="post">
-      {% csrf_token %}
-      <table>
-        <tr><td>Nombre</td>
-        <td><input type="text" name="nombre"/></td></tr>
-        <tr><td>Contenido</td>
-        <td><input type="text" name="pagina"/></td></tr>
-      </table>
-      <input type="submit" value="Enviar">
-    </form>
+    {% block leftsidebar %}
+      <h4 class="w3-bar-item"><b>Menu</b></h4>
+      {% for pageuser in pageuserlist %}
+        <a class="w3-bar-item w3-button w3-hover-black" href="/{{pageuser.usuario.username}}">{{pageuser.titulo}}</a>
+      {% endfor %}
+    {% endblock leftsidebar %}
+
+    {% block central %}
+      
+    {% endblock central %}
   </body>
 </html>

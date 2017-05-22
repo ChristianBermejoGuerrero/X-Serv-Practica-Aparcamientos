@@ -5,26 +5,38 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import get_template
 from django.template import Context, RequestContext, Template
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth import login as auth_login
 from parkingapp.models import Aparcamiento, PaginaUsuario, AparcSelect, Distrito, Comentario
-import time
 
 globAcc = False
 
-# Post.objects.order_by('created_date')
-##################### 5 aparcamientos mas comentados y TEMPLATES ###############################
+##################### TEMPLATES ###############################
 @csrf_exempt
 def showPrincipal(request):
     global globAcc
+    template = get_template('base.html')
     userlist = User.objects.all()
     pageuserlist = PaginaUsuario.objects.all()
     if len(userlist) != len(pageuserlist):
         for user in userlist:
             paginausuario = PaginaUsuario(usuario=user,titulo=("Pagina de " + user.username))
             paginausuario.save()
-        pageuserlist = PaginaUsuario.objects.all()
+    pageuserlist = PaginaUsuario.objects.all()
     aparclist = Aparcamiento.objects.all()
+    aparclistOrden = Aparcamiento.objects.all().order_by('numcomments').reverse()
     aparclistAcc = Aparcamiento.objects.all().filter(accesibilidad=1)
     respuesta = "<h2>BASE DE DATOS</h2>"
+    if len(aparclistOrden) != 0:
+        i = 0
+        for aparc in aparclistOrden:
+            if aparc.numcomments != None and i<5:
+                respuesta += "Nombre Aparcamiento: " + aparc.nombre
+                direccion = aparc.clasevial + " " + aparc.nombrevia
+                direccion += " " + aparc.numvia
+                respuesta += "<br>Direccion aparcamiento: " + direccion
+                respuesta += "<br><a href='" + aparc.link + "'>" + "Mas Informacion" + "</a><br>"
+                i = i+1
     if request.method == "POST" and globAcc == False:
         globAcc = True
     elif request.method == "POST" and globAcc == True:
@@ -55,7 +67,8 @@ def showPrincipal(request):
         respuesta += "ENHORABUENA ESTAS REGISTRADO COMO " + request.user.username
     else:
         respuesta += "<h3> Not logged in. Log in here >>><a href='/login'>LOGIN</a> </h3>"
-    return HttpResponse(respuesta)
+    c = RequestContext(request, {}) #dentro de los corchetes poner los rellenos de los huecos del template
+    return HttpResponse(template.render(c))
 
 ##################### APARCAMIENTOS DE 5 EN 5, CUANDO LLEGA POST DE CSS y TEMPLATES ######################
 @csrf_exempt
@@ -115,13 +128,13 @@ def showAllParkings(request):
             for aparc in aparclist:
                 respuesta +="<h4><li>" + aparc.nombre + " | "
                 respuesta +="<a href='/aparcamientos/" + str(aparc.id) + "'>Pagina del aparcamiento</a></li></h4>"
-    else:
+    elif request.method == "GET":
         respuesta += "<h2>TODOS LOS APARCAMIENTOS</h2>"
         aparclist = Aparcamiento.objects.all()
         if len(aparclist) != 0:
             for aparc in aparclist:
                 respuesta +="<h4><li>" + aparc.nombre + " | "
-                respuesta +="<a href='/aparcamientos" + str(aparc.id) + "'>Pagina del aparcamiento</a></li></h4>"
+                respuesta +="<a href='/aparcamientos/" + str(aparc.id) + "'>Pagina del aparcamiento</a></li></h4>"
 
     return HttpResponse(respuesta)
 
@@ -130,8 +143,11 @@ def showAllParkings(request):
 def showOneParking(request,identificador):
     aparcaux = Aparcamiento.objects.get(id=identificador)
     respuesta = "Nombre: " + aparcaux.nombre
-    direccion = aparcaux.clasevial + " " + aparcaux.nombrevia + " " + aparcaux.numvia
-    respuesta += "<br>Direccion: " + direccion
+    direccion = aparcaux.clasevial + " " + aparcaux.nombrevia + " "
+    if aparcaux.numvia == None:
+        respuesta += "<br>Direccion: " + direccion + "S/N"
+    else:
+        respuesta += "<br>Direccion: " + direccion + aparcaux.numvia
     respuesta += "<br><a href='" + aparcaux.link + "'>Pagina Oficial del aparcamiento</a>"
     respuesta += "<br>Latitud: " + str(aparcaux.latitud) + " | Longitud: " + str(aparcaux.longitud)
     respuesta += "<br>Descripcion: " + aparcaux.descripcion
@@ -142,7 +158,7 @@ def showOneParking(request,identificador):
     else:
         respuesta += "<br>Accesibilidad: NO disponible"
     if aparcaux.telefono == None or aparcaux.email == None:
-        respuesta += "<br>Datos de contacto: N/S"
+        respuesta += "<br>Datos de contacto: Sin datos de contacto"
     else:
         respuesta += "<br>Datos de contacto:"
         respuesta += "<li>Telefono: " + aparcaux.telefono + "</li>"
@@ -184,10 +200,22 @@ def showOneParking(request,identificador):
 # def about(request):
 #     return print("hola")
 
+def login(request):
+    if request.method == "POST":
+        nombre = request.POST['nombre']
+        print(nombre)
+        contraseña = request.POST['contra']
+        usuario = authenticate(username=nombre, password=contraseña)
+        if usuario != None:
+            if usuario.is_active:
+                auth_login(request, usuario)
+    return HttpResponseRedirect('/')
+
 def logout(request):
     #redirigir a /admin/logout
     return redirect('/admin/logout/')
 
 def uploadxml(request):
+    #falta poner boton en la pagina principal para cargar los aparcamientos la primera vez
     update()
     return redirect('/')

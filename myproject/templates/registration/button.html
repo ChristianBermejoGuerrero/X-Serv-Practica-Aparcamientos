@@ -1,0 +1,23 @@
+{% load staticfiles %}
+
+{% extends principal.html %}
+
+#cambiar action para que concuerde con el views
+
+<html>
+  <body>
+    {% block rightsidebar %}
+      {% if globalAcc == True %}
+        <form class="w3-container" action="/login" method ="POST">
+          {% csrf_token %}
+          <h3 class="w3-text-teal w3-button w3-border w3-hover-black" href="/">Todos los aparcamientos</a>
+        </form>
+      {% else %}
+        <form class="w3-container" action="/login" method ="POST">
+          {% csrf_token %}
+          <h3 class="w3-text-teal w3-button w3-border w3-hover-black" href="/">Aparcamientos disponibles</a>
+        </form>
+      {% endif %}
+    {% endblock rightsidebar %}
+  </body>
+</html>

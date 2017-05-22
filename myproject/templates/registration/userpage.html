@@ -1,0 +1,52 @@
+{% load staticfiles %}
+
+{% extends base.html %}
+
+# comprobar si el usuario esta identificado
+# cambiar action de ambos formularios
+# poner barra de siguiente para ver los siguientes 5 aparcamientos seleccionados
+
+<html>
+  <body>
+    {% block central %}
+      {% if globalAcc == True %}
+        <h1 class="w3-text-teal">Aparcamientos disponibles seleccionados</h1>
+        {% for aparcSelect in aparclistSelect %}
+          <h2 class="w3-text-teal">{{ aparcAccorden.nombre }}</h2>
+          <li><h3 class="w3-text-teal">Direccion: {{ aparcAccorden.clasevial }} {{ aparcAccorden.nombrevia }}, {{ aparcAccorden.numvia }}</h3></li>
+          <li><h3 class="w3-text-teal w3-button w3-hover-black" href="/{{ aparcAccorden.link }}">Más información</a></h3></li>
+        {% endfor %}
+      {% else %}
+        <h1 class="w3-text-teal">Todos los aparcamientos seleccionados</h1>
+        {% for aparcorden in aparclistOrden %}
+          <h2 class="w3-text-teal">{{ aparcorden.nombre }}</h2>
+          <lu>
+          <li><h3 class="w3-text-teal">Direccion: {{ aparcorden.clasevial }} {{ aparcorden.nombrevia }}, {{ aparcorden.numvia }}</h3></li>
+          <li><h3 class="w3-text-teal w3-button w3-hover-black" href="/{{ aparcorden.link }}">Más información</a></h3></li>
+        {% endfor %}
+      {% endif %}
+      </ul>
+    {% endblock central %}
+
+    {% block leftsidebar %}
+      <form class="w3-container" action="/login" method ="POST">
+        {% csrf_token %}
+        <h3>Cambia CSS</h3>
+        <p><input class="w3-input" type="text" name="nombre" placeholder="Tamaño de letra"></p>
+        <p><input class="w3-input" type="password" name="contra" placeholder="Color de fondo"></p>
+        <p><button class="w3-button w3-black">Enviar</button></p>
+      </form>
+    {% endblock leftsidebar %}
+
+    {% block rightsidebar %}
+      <form class="w3-container" action="/login" method ="POST">
+        {% csrf_token %}
+        <h3>Cambia CSS</h3>
+        <p><input class="w3-input" type="text" name="nuevotitulo" value="Enviar Titulo" placeholder="Nuevo titulo"></p>
+        <p><button class="w3-button w3-black">Enviar</button></p>
+      </form>
+    {% endblock rightsidebar %}
+
+
+  </body>
+</html>
