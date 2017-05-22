@@ -15,7 +15,7 @@ globAcc = False
 @csrf_exempt
 def showPrincipal(request):
     global globAcc
-    template = get_template('base.html')
+    template = get_template('button.html')
     userlist = User.objects.all()
     pageuserlist = PaginaUsuario.objects.all()
     if len(userlist) != len(pageuserlist):
@@ -24,119 +24,73 @@ def showPrincipal(request):
             paginausuario.save()
     pageuserlist = PaginaUsuario.objects.all()
     aparclist = Aparcamiento.objects.all()
-    aparclistOrden = Aparcamiento.objects.all().order_by('numcomments').reverse()
+    aparclistOrden = aparclist.exclude(numcomments=0).order_by('numcomments').reverse()[:5]
     aparclistAcc = Aparcamiento.objects.all().filter(accesibilidad=1)
-    respuesta = "<h2>BASE DE DATOS</h2>"
-    if len(aparclistOrden) != 0:
-        i = 0
-        for aparc in aparclistOrden:
-            if aparc.numcomments != None and i<5:
-                respuesta += "Nombre Aparcamiento: " + aparc.nombre
-                direccion = aparc.clasevial + " " + aparc.nombrevia
-                direccion += " " + aparc.numvia
-                respuesta += "<br>Direccion aparcamiento: " + direccion
-                respuesta += "<br><a href='" + aparc.link + "'>" + "Mas Informacion" + "</a><br>"
-                i = i+1
+    aparclistAccOrden = aparclistAcc.exclude(numcomments=0).order_by('numcomments').reverse()[:5]
+    # tenemos que modificar las listas anteriores para poder pasarlas como contexto
     if request.method == "POST" and globAcc == False:
         globAcc = True
     elif request.method == "POST" and globAcc == True:
         globAcc = False
-    respuesta += '<form action="" method="POST">'
-    if globAcc == False:
-        respuesta += '<input type="submit" value="Aparcamientos Accesibles"></form>'
-        if len(aparclist) != 0:
-            for aparc in aparclist:
-                respuesta+="<h4><li> | " + aparc.nombre + "</li></h4>"
-        else :
-            respuesta += "NO HAY APARCAMIENTOS CARGADOS POR FAVOR VE A /uploadxml."
-    else:
-        respuesta += '<input type="submit" value="Todos los aparcamientos"></form>'
-        if len(aparclistAcc) != 0 and len(aparclist) != 0:
-            for aparcAcc in aparclistAcc:
-                    respuesta+="<h4><li> | " + aparcAcc.nombre + "</li></h4>"
-        else :
-            respuesta += "NO HAY APARCAMIENTOS DISPONIBLES AHORA MISMO."
-    if len(pageuserlist) != 0:
-        respuesta += "<h2>PAGINAS DE USUARIO</h2>"
-        for pageuser in pageuserlist:
-            respuesta+="<h4><li>" + pageuser.usuario.username + " | "
-            respuesta+= "<a href='" + pageuser.usuario.username + "'>" + pageuser.titulo + "</a></li></h4>"
-    else :
-        respuesta += "NO TENEMOS PAGINAS DE USUARIO. CREA USUARIOS POR FAVOR."
-    if request.user.is_authenticated():
-        respuesta += "ENHORABUENA ESTAS REGISTRADO COMO " + request.user.username
-    else:
-        respuesta += "<h3> Not logged in. Log in here >>><a href='/login'>LOGIN</a> </h3>"
-    c = RequestContext(request, {}) #dentro de los corchetes poner los rellenos de los huecos del template
+    c = RequestContext(request, {'globAcc':globAcc,
+                                 'pageuserlist':pageuserlist,
+                                 'aparclistOrden':aparclistOrden,
+                                 'aparclistAccOrden':aparclistAccOrden})
     return HttpResponse(template.render(c))
 
 ##################### APARCAMIENTOS DE 5 EN 5, CUANDO LLEGA POST DE CSS y TEMPLATES ######################
 @csrf_exempt
 def showUserpage(request,nombre):
+    template = get_template('userpage.html')
     try:
         useraux = User.objects.get(username=nombre)
         pageuser = PaginaUsuario.objects.get(usuario=useraux)
         aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
-        respuesta = pageuser.titulo
-        if len(aparclistSelect) != 0:
-            respuesta += "<h4>APARCAMIENTOS SELECCIONADOS</h4>"
-            for select in aparclistSelect:
-                respuesta += "Nombre Aparcamiento: " + select.aparcamiento.nombre
-                direccion = select.aparcamiento.clasevial + " " + select.aparcamiento.nombrevia
-                direccion += " " + select.aparcamiento.numvia
-                respuesta += "<br>Direccion aparcamiento: " + direccion
-                respuesta += "<br><a href='" + select.aparcamiento.link + "'>" + "Mas Informacion" + "</a>"
-                aux = (str(select.fechaSelect))
-                aux = aux[0:aux.find(".")]
-                respuesta += "<br>Fecha de seleccion: " + aux
+        aparclistAccSelect = []
+        for aparcSelect in aparclistSelect:
+            if aparcSelect.aparcamiento.accesibilidad == 1:
+                aparclistAccSelect.append(aparcSelect)
+
     except PaginaUsuario.DoesNotExist:
         respuesta = "HAS INTRODUCIDO EL NOMBRE DEL USUARIO MAL O NO EXISTE."
+    if request.method == "POST":
+        print(request)
+    if request.method == "POST" and "tamaño" in request.POST and "color" in request.POST:
+        print("hola")  ##################################################PROCESAR CSS
+        return HttpResponseRedirect("/" + nombre)
+    if request.method == "POST" and "nuevotitulo" in request.POST:
+        print("hola1")
+        nuevotitulo = request.POST['nuevotitulo']
+        useraux = User.objects.get(username=request.user.username)
+        pageuser = PaginaUsuario.objects.get(usuario=useraux)
+        pageuser.titulo = nuevotitulo
+        pageuser.save()
+        return HttpResponseRedirect("/" + nombre)
 
-    if request.user.is_authenticated():
-        respuesta += ". <br><br>ENHORABUENA ESTAS REGISTRADO"
-        respuesta += '<form action="" method="POST">'
-        respuesta += 'Nuevo titulo de tu pagina personal: <input type="text" name="titulo">'
-        respuesta += '<input type="submit" value="Enviar Titulo" name="nuevotitulo"></form>'
-        respuesta += '<form action="" method="POST">'
-        respuesta += 'Nuevo tamaño de letra: <input type="text" name="nuevotamaño">'
-        respuesta += '<br>Nuevo color de fondo: <input type="text" name="nuevocolor">'
-        respuesta += '<input type="submit" value="Enviar CSS" name="nuevoCSS"></form>'
-        if request.method == "POST" and request.POST.get("nuevoCSS", "") == 'Enviar CSS':
-            print("hola")
-            return HttpResponseRedirect("/" + nombre)
-        if request.method == "POST" and request.POST.get("nuevotitulo", "") == 'Enviar Titulo':
-            nuevotitulo = request.POST['titulo']
-            useraux = User.objects.get(username=request.user.username)
-            pageuser = PaginaUsuario.objects.get(usuario=useraux)
-            pageuser.titulo = nuevotitulo
-            pageuser.save()
-            return HttpResponseRedirect("/" + nombre)
-
-    return HttpResponse(respuesta)
+    c = RequestContext(request, {'globAcc':globAcc,
+                                 'aparclistSelect':aparclistSelect,
+                                 'aparclistAccSelect':aparclistAccSelect})
+    return HttpResponse(template.render(c))
 
 @csrf_exempt
 def showAllParkings(request):
-    respuesta = '<form action="" method="POST">'
-    respuesta += 'Filtrar por distrito del aparcamiento: <input type="text" name="distrito">'
-    respuesta += '<input type="submit" value="Enviar" name="distrito a filtrar"></form>'
+    template = get_template('allAparcs.html')
+    aparclist = Aparcamiento.objects.all()
+    aparclistAcc = aparclist.filter(accesibilidad=1)
     if request.method == "POST":
         distritofilt = request.POST['distrito'].upper()
-        respuesta += "<h2>APARCAMIENTOS DEL DISTRITO: " + distritofilt + "</h2>"
         distritoaux = Distrito.objects.get(nombre=distritofilt)
-        aparclist = Aparcamiento.objects.all().filter(distrito=distritoaux)
-        if len(aparclist) != 0:
-            for aparc in aparclist:
-                respuesta +="<h4><li>" + aparc.nombre + " | "
-                respuesta +="<a href='/aparcamientos/" + str(aparc.id) + "'>Pagina del aparcamiento</a></li></h4>"
+        aparclistFilt = aparclist.filter(distrito=distritoaux)
+        aparclistAccFilt = aparclistFilt.filter(accesibilidad=1)
+        c = RequestContext(request, {'globAcc':globAcc,
+                                     'aparclist':aparclistFilt,
+                                     'aparclistAcc':aparclistAccFilt})
     elif request.method == "GET":
-        respuesta += "<h2>TODOS LOS APARCAMIENTOS</h2>"
-        aparclist = Aparcamiento.objects.all()
-        if len(aparclist) != 0:
-            for aparc in aparclist:
-                respuesta +="<h4><li>" + aparc.nombre + " | "
-                respuesta +="<a href='/aparcamientos/" + str(aparc.id) + "'>Pagina del aparcamiento</a></li></h4>"
+        c = RequestContext(request, {'globAcc':globAcc,
+                                     'aparclist':aparclist,
+                                     'aparclistAcc':aparclistAcc})
 
-    return HttpResponse(respuesta)
+    return HttpResponse(template.render(c))
 
 
 @csrf_exempt

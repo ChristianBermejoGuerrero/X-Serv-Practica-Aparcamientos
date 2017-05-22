@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+#cambiar action del formulario
+
+{% block leftsidebar %}
+  <div class="w3-quarter w3-collapse w3-large w3-border" style="z-index:2;width:250px;margin-top:80px; margin-left:30px">
+    <form class="w3-container" action="/aparcamientos" method ="POST">
+      {% csrf_token %}
+      <h3>Filtra por distrito</h3>
+      <p><input class="w3-input" type="text" name="distrito" placeholder="Distrito"></p>
+      <p><button class="w3-button w3-black">Enviar</button></p>
+    </form>
+  </div>
+{% endblock leftsidebar %}
+
+{% block central %}
+  <div class="" style="margin-left:290px">
+    <div class="w3-twothird" style= "margin-right:-5px">
+      {% if globAcc == True %}
+        <h1 class="w3-text-red" style="margin-left:70px; margin-top:60px">Aparcamientos disponibles</h1>
+        {% for aparcAcc in aparclistAcc %}
+          <h3 class="w3-text-teal style="margin-left:70px"">{{ aparcAcc.nombre }}</h3>
+          <h4 class="" style="margin-left:90px">Dirección: {{ aparcAcc.clasevial }} {{ aparcAcc.nombrevia }}, {{ aparcAcc.numvia }}</h4>
+          <h4><a class="" style="margin-left:90px" href="/aparcamientos/{{ aparcAcc.id }}">Más información</a></h4>
+        {% endfor %}
+      {% else %}
+        <h1 class="w3-text-red" style="margin-left:70px;  margin-top:60px">Todos los parcamientos </h1>
+        {% for aparc in aparclist %}
+          <h3 class="w3-text-teal" style="margin-left:70px">{{ aparc.nombre }}</h3>
+          <h4 class="" style="margin-left:90px">Dirección: {{ aparc.clasevial }} {{ aparc.nombrevia }}, {{ aparc.numvia }}</h4>
+          <h4><a class="" style="margin-left:90px" href="/aparcamientos/{{ aparc.id }}">Más información</a></h4>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock central %}

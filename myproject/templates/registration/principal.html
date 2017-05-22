@@ -1,41 +1,35 @@
-{% load staticfiles %}
+{% extends "base.html" %}
 
-{% extends base.html %}
+{% block leftsidebar %}
+  <div class="w3-quarter w3-bar w3-bar-block w3-collapse w3-large w3-animate-left" style="z-index:2;width:195px;margin-top:10px;">
+    <h4 class="w3-bar-item"><b>Menu</b></h4>
+    {% for pageuser in pageuserlist %}
+      <a class="w3-bar-item w3-button w3-hover-black" href="/{{ pageuser.usuario.username }}">{{ pageuser.titulo }}</a>
+    {% endfor %}
+  </div>
+{% endblock leftsidebar %}
 
-<html>
-  <body>
-    {% block leftsidebar %}
-      <h4 class="w3-bar-item"><b>Menu</b></h4>
-      {% for pageuser in pageuserlist %}
-        <a class="w3-bar-item w3-button w3-hover-black" href="/{{ pageuser.usuario.username }}">{{ pageuser.titulo }}</a>
-      {% endfor %}
-    {% endblock leftsidebar %}
+{% block central %}
+  <div class="" style="margin-left:240px">
+    <div class="w3-twothird">
+      {% if globAcc == True %}
+        <h1 class="w3-text-red">Aparcamientos disponibles más comentados</h1>
+        {% for aparcAccOrden in aparclistAccOrden %}
+          <h3 class="w3-text-teal">{{ aparcAccOrden.nombre }}</h3>
+          <h4 class="" style="margin-left:20px">Direccion: {{ aparcAccOrden.clasevial }} {{ aparcAccOrden.nombrevia }}, {{ aparcAccOrden.numvia }}</h4>
+          <h4><a class="" style="margin-left:20px" href="/aparcamientos/{{ aparcAccOrden.id }}">Más información</a></h4>
+        {% endfor %}
+      {% else %}
+        <h1 class="w3-text-red">Aparcamientos más comentados</h1>
+        {% for aparcOrden in aparclistOrden %}
+          <h3 class="w3-text-teal">{{ aparcOrden.nombre }}</h3>
+          <h4 class="" style="margin-left:20px">Direccion: {{ aparcOrden.clasevial }} {{ aparcOrden.nombrevia }}, {{ aparcOrden.numvia }}</h4>
+          <h4><a class="" style="margin-left:20px" href="/aparcamientos/{{ aparcOrden.id }}">Más información</a></h4>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock central %}
 
-    {% block central %}
-    {% if globalAcc == True %}
-      <h1 class="w3-text-teal">Aparcamientos disponibles mas comentados</h1>
-      {% for aparcAccorden in aparclistAccOrden %}
-        <h2 class="w3-text-teal">{{ aparcAccorden.nombre }}</h2>
-        <li><h3 class="w3-text-teal">Direccion: {{ aparcAccorden.clasevial }} {{ aparcAccorden.nombrevia }}, {{ aparcAccorden.numvia }}</h3></li>
-        <li><h3 class="w3-text-teal w3-button w3-hover-black" href="/{{ aparcAccorden.link }}">Más información</a></h3></li>
-      {% endfor %}
-    {% else %}
-      <h1 class="w3-text-teal">Aparcamientos mas comentados</h1>
-      {% for aparcorden in aparclistOrden %}
-        <h2 class="w3-text-teal">{{ aparcorden.nombre }}</h2>
-        <lu>
-        <li><h3 class="w3-text-teal">Direccion: {{ aparcorden.clasevial }} {{ aparcorden.nombrevia }}, {{ aparcorden.numvia }}</h3></li>
-        <li><h3 class="w3-text-teal w3-button w3-hover-black" href="/{{ aparcorden.link }}">Más información</a></h3></li>
-      {% endfor %}
-    {% endif %}
-    </ul>
-    {% endblock central %}
-
-    {% block rightsidebar %}
-    {% endblock rightsidebar %}
-
-  </body>
-</html>
-
-
-## comprobar si el boton de accesible esta pulsado o no, para mostrar una lista u otra ##
+{% block rightsidebar %}
+{% endblock rightsidebar %}

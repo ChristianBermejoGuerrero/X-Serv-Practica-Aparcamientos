@@ -1,52 +1,52 @@
-{% load staticfiles %}
+{% extends "base.html" %}
 
-{% extends base.html %}
-
-# comprobar si el usuario esta identificado
-# cambiar action de ambos formularios
-# poner barra de siguiente para ver los siguientes 5 aparcamientos seleccionados
-
-<html>
-  <body>
-    {% block central %}
-      {% if globalAcc == True %}
-        <h1 class="w3-text-teal">Aparcamientos disponibles seleccionados</h1>
-        {% for aparcSelect in aparclistSelect %}
-          <h2 class="w3-text-teal">{{ aparcAccorden.nombre }}</h2>
-          <li><h3 class="w3-text-teal">Direccion: {{ aparcAccorden.clasevial }} {{ aparcAccorden.nombrevia }}, {{ aparcAccorden.numvia }}</h3></li>
-          <li><h3 class="w3-text-teal w3-button w3-hover-black" href="/{{ aparcAccorden.link }}">Más información</a></h3></li>
+{% block central %}
+  <div class="" style="margin-left:290px">
+    <div class="w3-twothird" style= "margin-right:-5px">
+      {% if globAcc == True %}
+        <h1 class="w3-text-red" style="margin-left:70px; margin-top:60px">Aparcamientos disponibles seleccionados</h1>
+        {% for aparcAccSelect in aparclistAccSelect %}
+          <h3 class="w3-text-teal style="margin-left:70px"">{{ aparcAccSelect.aparcamiento.nombre }}</h3>
+          <h4 class="" style="margin-left:90px">Dirección: {{ aparcAccSelect.aparcamiento.clasevial }} {{ aparcAccSelect.aparcamiento.nombrevia }}, {{ aparcAccSelect.aparcamiento.numvia }}</h4>
+          <h4 class="" style="margin-left:90px">Fecha de selección: {{ aparcAccSelect.fechaSelect }}</h4>
+          <h4><a class="" style="margin-left:90px" href="/aparcamientos/{{ aparcAccSelect.id }}">Más información</a></h4>
         {% endfor %}
       {% else %}
-        <h1 class="w3-text-teal">Todos los aparcamientos seleccionados</h1>
-        {% for aparcorden in aparclistOrden %}
-          <h2 class="w3-text-teal">{{ aparcorden.nombre }}</h2>
-          <lu>
-          <li><h3 class="w3-text-teal">Direccion: {{ aparcorden.clasevial }} {{ aparcorden.nombrevia }}, {{ aparcorden.numvia }}</h3></li>
-          <li><h3 class="w3-text-teal w3-button w3-hover-black" href="/{{ aparcorden.link }}">Más información</a></h3></li>
+        <h1 class="w3-text-red" style="margin-left:70px;  margin-top:60px">Todos los parcamientos seleccionados</h1>
+        {% for aparcSelect in aparclistSelect %}
+          <h3 class="w3-text-teal" style="margin-left:70px">{{ aparcSelect.aparcamiento.nombre }}</h3>
+          <h4 class="" style="margin-left:90px">Dirección: {{ aparcSelect.aparcamiento.clasevial }} {{ aparcSelect.aparcamiento.nombrevia }}, {{ aparcSelect.aparcamiento.numvia }}</h4>
+          <h4 class="" style="margin-left:90px">Fecha de selección: {{ aparcSelect.fechaSelect }}</h4>
+          <h4><a class="" style="margin-left:90px" href="/aparcamientos/{{ aparcSelect.id }}">Más información</a></h4>
         {% endfor %}
       {% endif %}
-      </ul>
-    {% endblock central %}
+    </div>
+  </div>
+{% endblock central %}
 
-    {% block leftsidebar %}
-      <form class="w3-container" action="/login" method ="POST">
+{% if user.is_authenticated %}
+  {% block leftsidebar %}
+    <div class="w3-quarter w3-collapse w3-large w3-border" style="z-index:2;width:250px;margin-top:80px; margin-left:30px">
+      <form class="w3-container" action="/{{ user.username }}" method ="POST">
         {% csrf_token %}
-        <h3>Cambia CSS</h3>
-        <p><input class="w3-input" type="text" name="nombre" placeholder="Tamaño de letra"></p>
-        <p><input class="w3-input" type="password" name="contra" placeholder="Color de fondo"></p>
+        <h3>Cambia el CSS</h3>
+        <p><input class="w3-input" type="text" name="tamaño" placeholder="Tamaño de letra"></p>
+        <p><input class="w3-input" type="text" name="color"  placeholder="Color de fondo"></p>
         <p><button class="w3-button w3-black">Enviar</button></p>
       </form>
-    {% endblock leftsidebar %}
+    </div>
+  {% endblock leftsidebar %}
 
-    {% block rightsidebar %}
-      <form class="w3-container" action="/login" method ="POST">
-        {% csrf_token %}
-        <h3>Cambia CSS</h3>
-        <p><input class="w3-input" type="text" name="nuevotitulo" value="Enviar Titulo" placeholder="Nuevo titulo"></p>
-        <p><button class="w3-button w3-black">Enviar</button></p>
-      </form>
-    {% endblock rightsidebar %}
-
-
-  </body>
-</html>
+  {% block rightsidebar %}
+    <div class="w3-quarter w3-right-align w3-container" style="margin-top:40px;">
+      <div class="w3-padding-large w3-padding-32 w3-center w3-border">
+        <form class="w3-container" action="/{{ user.username }}" method ="POST">
+          {% csrf_token %}
+          <h3>Cambia el título de tu página:</h3>
+          <p><input class="w3-input" type="text" name="nuevotitulo" placeholder="Nuevo titulo"></p>
+          <p><button class="w3-button w3-black">Enviar</button></p>
+        </form>
+      </div>
+    </div>
+  {% endblock rightsidebar %}
+{% endif %}

@@ -12,7 +12,7 @@ class Aparcamiento(models.Model):
     clasevial = models.CharField(max_length=100,null=True, blank=True, default=None)
     nombrevia = models.CharField(max_length=100,null=True, blank=True, default=None)
     numvia = models.CharField(max_length=10,null=True, blank=True, default=None) #algunas tienen letras
-    numcomments = models.IntegerField(null=True, blank=True, default=None)
+    numcomments = models.IntegerField(null=True, blank=True, default=0)
     latitud = models.FloatField(null=True, blank=True, default=None)
     longitud = models.FloatField(null=True, blank=True, default=None)
     descripcion = models.TextField(null=True, blank=True, default=None)
