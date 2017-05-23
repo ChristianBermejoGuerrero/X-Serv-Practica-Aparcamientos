@@ -8,19 +8,24 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster">
   <style>
     html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
-    .w3-lobster {
-        font-family: "Lobster", serif;
+    body {
+      background-image: url("https://inspirationhut.net/wp-content/uploads/2013/05/201.png");
     }
+    .mySlides {display:none}
+    .w3-left, .w3-right, .w3-badge {cursor:pointer}
+    .w3-badge {height:13px;width:13px;padding:0}
+    {% block style %}
+    {% endblock style%}
   </style>
+
   <body>
     <!-- Image Header -->
+    ### https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_parallax&stacked=h y SLIDESHOW  
     <div class="w3-display-container w3-animate-opacity">
       <img src="http://www.precege.com/wp-content/uploads/2015/12/oposiciones-madrid.jpg" alt="madrid" style="width:100%;min-height:350px;max-height:400px;">
-      <div class="w3-container w3-display-bottomleft w3-margin-bottom">
+      <div class="w3-container w3-xxlarge w3-display-middle w3-margin-bottom">HOLA
       </div>
     </div>
 
@@ -47,10 +52,10 @@
       {% block central %}
       {% endblock central %}
       <div class="w3-quarter w3-container">
-      	<div class="w3-border w3-padding-large w3-padding-32 w3-center " style="margin-top:30px;">
+      	<div class="w3-border w3-padding-large w3-padding-32 w3-center " style="margin-top:80px;margin-left:10px;margin-right:-10px">
           <div>
             {% if user.is_authenticated %}
-              <p class="w3-large">Identificado como:</p>
+              <h3>Identificado como:</h3>
                 <p class="w3-xlarge" style="margin-top:-10px;"><i>{{ user.username }}</i></p>
                   <form class="w3-container" action="/logout" method ="POST">
                   {% csrf_token %}
@@ -59,7 +64,7 @@
             {% else %}
               <form class="w3-container" action="/login" method ="POST">
                 {% csrf_token %}
-                <h3>Identificate</h3>
+                <h3>Identifícate</h3>
                 <p><input class="w3-input" type="text" name="nombre" placeholder="Nombre"></p>
                 <p><input class="w3-input" type="password" name="contra" placeholder="Contraseña"></p>
                 <button class="w3-button w3-black">Login</button>
@@ -73,7 +78,7 @@
     </div>
 
     <footer>
-      <div class="w3-container w3-theme-l2 w3-padding-16">
+      <div class="w3-container w3-theme-l2 w3-padding-16" style="margin-top:30px">
         <h4>Footer</h4>
       </div>
       <div class="w3-container w3-theme-l1">

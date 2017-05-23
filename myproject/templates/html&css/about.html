@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block central %}
+<div class="" style="margin-left:190px;margin-top:40px">
+  <div class="w3-twothird" style= "margin-left:-85px">
+  <h2>Autor: Christian Bermejo Guerrero</h2>
+  <h2>Grado: Ingeniería en Tecnologías de la Telecomunicación</h2>
+  <h2>Email: c.bermejog@alumnos.urjc.es</h2><br>
+  <h2>Funcionamiento de la web</h2>
+  <h3>Recurso /</h3>
+  <p class="" style= "margin-left:15px">Página principal de la práctica. Muestra un listado de los cinco
+  aparcamientos con más comentarios. En la parte izquierda, se encuentra un listado
+  de las páginas personales disponibles. Por último, se muestra un botón, que al
+  pulsarlo se pasará a ver en todos los listados los aparcamientos accesibles, y
+  sólo estos. Si se vuelve a pulsar, se volverán a ver todos los aparcamientos.</p>
+
+  <h3>Recurso /(usuario)</h3>
+  <p class="" style= "margin-left:15px">Página personal del usuario.Mostrará los aparcamientos seleccionados
+  por ese usuario (aunque no puede haber más de 5 a la vez; si hay más debería
+  haber un enlace para mostrar las 5 siguientes y así en adelante, siempre de
+  5 en 5). Para cada aparcamiento se mostrará la misma información que en
+  la página principal. Además, para cada aparcamiento se deberá mostrar la
+  fecha en la que fue seleccionada por el usuario.</p>
+
+  <h3>Recurso /aparcamientos</h3>
+  <p class="" style= "margin-left:15px">Página con todos los aparcamientos. Para cada uno de ellos
+  aparece el nombre y un enlace a su página. En la parte izquierda de la página,
+  se muestra un formulario que permite filtrar estos aparcamientos según
+  su distrito.</p>
+
+  <h3>Recurso /aparcamientos/(id)</h3>
+  <p class="" style= "margin-left:15px">Página de un aparcamiento en concreto. Muestra toda la
+  información que contiene el XML del portal de datos abiertos del Ayuntamiento
+  de Madrid. Además, existe un listado de todos los comentarios sobre este aparcamiento.
+  Para enviar comentarios, es necesario estar identificado.
+  </p>
+
+  <h3>Recurso /(usuario)/xml</h3>
+  <p class="" style= "margin-left:15px">Canal XML para los aparcamientos seleccionados por ese
+  usuario.</p>
+
+  <h3>Recurso /about</h3>
+  <p class="" style= "margin-left:15px">Página que contiene toda la información de esta web. Es en la que
+  se encuentra ahora mismo.</p><br>
+
+  </div>
+</div>
+{% endblock central %}

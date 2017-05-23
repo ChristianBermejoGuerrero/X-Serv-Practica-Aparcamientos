@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block style %}
+html,body,h1,h2,h3,h4,h5,h6 {
+  font-size: {{ estilo.tamano }}px;
+  background-color: {{ estilo.color }};
+}
+*{
+  font-size: {{ estilo.tamano }}px;
+  background-color: {{ estilo.color }};
+}
+{% endblock style %}
+
+{% block central %}
+  <div class="" style="margin-left:50px;margin-right:-50px">
+    <div class="w3-twothird" style= "margin-right:-5px">
+      <h1 class="w3-text-red" style="margin-left:20px; margin-top:60px">{{ aparc.nombre }}</h1>
+      <h4 class="" style="margin-left:40px">Descripción: {{ aparc.descripcion }} </h4>
+      <h4 class="" style="margin-left:40px">Dirección: {{ aparc.clasevial }} {{ aparc.nombrevia }}, {{ aparc.numvia }}</h4>
+      <h4 class="" style="margin-left:40px">Distrito: {{ aparc.distrito.nombre }}, Barrio: {{ aparc.barrio }} </h4>
+      <h4 class="" style="margin-left:40px">Latitud: {{ aparc.latitud }} </h4>
+      <h4 class="" style="margin-left:40px">Longitud: {{ aparc.longitud }} </h4>
+      {% if aparc.accesibilidad == 1 %}
+        <h4 class="" style="margin-left:40px">Accesibilidad: Plazas disponibles</h4>
+      {% else %}
+        <h4 class="" style="margin-left:40px">Accesibilidad: Sin plazas disponibles</h4>
+      {% endif %}
+      <h4><a class="" style="margin-left:40px" href="{{ aparc.link }}">Página Oficial del aparcamiento</a></h4>
+      {% if aparc.telefono == None %}
+        <h4 class="" style="margin-left:40px">Teléfono: No disponible</h4>
+      {% else %}
+        <h4 class="" style="margin-left:40px">Teléfono: {{ aparc.telefono }}</h4>
+      {% endif %}
+      {% if aparc.email == None %}
+        <h4 class="" style="margin-left:40px">Email: No disponible</h4>
+      {% else %}
+        <h4 class="" style="margin-left:40px">Email: {{ aparc.email }}</h4>
+      {% endif %}
+      {% if user.is_authenticated %}
+        <div class="" style="margin-top:20px">
+          <form class="w3-container" action="/aparcamientos/{{ aparc.id }}" method ="POST">
+            <h3><p><label class="w3-text-brown"><b>Deja tu comentario:</b></label></h3></p>
+            <p><input class="w3-input w3-border w3-sand" style="height: 60px" type="text" name="newcomment" maxlength="66" placeholder="Escribe aquí...(Límite 65 caracteres)"></p>
+            <p><button class="w3-btn w3-brown" style="margin-left:640px">Enviar</button></p>
+          </form>
+        </div>
+        <h3 class="w3-text-teal" style="margin-top:20px;margin-left:10px">Comentarios sobre este aparcamiento:</h3>
+      {% endif %}
+      {% for comment in commentlist %}
+        <p><h4 class="w3-panel w3-card w3-yellow w3-padding-large w3-padding-32 w3-round-large" style="margin-right:-20px">{{ comment.text }}</h4></p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock central %}
+
+{% block rightsidebar %}
+{% if user.is_authenticated %}
+    <div class="w3-quarter w3-right-align w3-container">
+      <div class="w3-padding-large w3-padding-32 w3-center">
+          <form class="w3-container" action="/aparcamientos/{{ aparc.id }}" method ="POST" style="margin-top:30px;margin-left:-65px">
+            {% csrf_token %}
+            <h3><button class="w3-button w3-black">Seleccionar aparcamiento</button></h3>
+          </form>
+      </div>
+    </div>
+  {% endif %}
+{% endblock rightsidebar %}

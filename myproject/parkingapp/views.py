@@ -7,14 +7,17 @@ from django.template import Context, RequestContext, Template
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
-from parkingapp.models import Aparcamiento, PaginaUsuario, AparcSelect, Distrito, Comentario
+from parkingapp.models import Aparcamiento, PaginaUsuario, AparcSelect, Distrito, Comentario, Estilo
 
 globAcc = False
+start = 0
+end = 5
 
-##################### TEMPLATES ###############################
 @csrf_exempt
 def showPrincipal(request):
     global globAcc
+    mostrar = False
+    mostrarbutton = True
     template = get_template('button.html')
     userlist = User.objects.all()
     pageuserlist = PaginaUsuario.objects.all()
@@ -24,25 +27,52 @@ def showPrincipal(request):
             paginausuario.save()
     pageuserlist = PaginaUsuario.objects.all()
     aparclist = Aparcamiento.objects.all()
+    if len(aparclist) != 0:
+        mostrarbutton = False
     aparclistOrden = aparclist.exclude(numcomments=0).order_by('numcomments').reverse()[:5]
     aparclistAcc = Aparcamiento.objects.all().filter(accesibilidad=1)
     aparclistAccOrden = aparclistAcc.exclude(numcomments=0).order_by('numcomments').reverse()[:5]
-    # tenemos que modificar las listas anteriores para poder pasarlas como contexto
+    if len(aparclistAccOrden) != 0:
+        mostrar = True
+    elif len(aparclistOrden) != 0:
+        mostrar = True
     if request.method == "POST" and globAcc == False:
         globAcc = True
     elif request.method == "POST" and globAcc == True:
         globAcc = False
-    c = RequestContext(request, {'globAcc':globAcc,
-                                 'pageuserlist':pageuserlist,
-                                 'aparclistOrden':aparclistOrden,
-                                 'aparclistAccOrden':aparclistAccOrden})
+    if request.user.is_authenticated():
+        try:
+            estilocss = Estilo.objects.get(usuario=request.user)
+            c = RequestContext(request, {'globAcc':globAcc,
+                                         'mostrar':mostrar,
+                                         'mostrarbutton':mostrarbutton,
+                                         'estilo':estilocss,
+                                         'pageuserlist':pageuserlist,
+                                         'aparclistOrden':aparclistOrden,
+                                         'aparclistAccOrden':aparclistAccOrden})
+        except Estilo.DoesNotExist:
+            c = RequestContext(request, {'globAcc':globAcc,
+                                         'mostrar':mostrar,
+                                         'mostrarbutton':mostrarbutton,
+                                         'pageuserlist':pageuserlist,
+                                         'aparclistOrden':aparclistOrden,
+                                         'aparclistAccOrden':aparclistAccOrden})
+    else:
+        c = RequestContext(request, {'globAcc':globAcc,
+                                     'mostrar':mostrar,
+                                     'mostrarbutton':mostrarbutton,
+                                     'pageuserlist':pageuserlist,
+                                     'aparclistOrden':aparclistOrden,
+                                     'aparclistAccOrden':aparclistAccOrden})
     return HttpResponse(template.render(c))
 
-##################### APARCAMIENTOS DE 5 EN 5, CUANDO LLEGA POST DE CSS y TEMPLATES ######################
 @csrf_exempt
 def showUserpage(request,nombre):
-    template = get_template('userpage.html')
+    global start,end
     try:
+        mostrar = False
+        mostrarbutton = False
+        template = get_template('userpage.html')
         useraux = User.objects.get(username=nombre)
         pageuser = PaginaUsuario.objects.get(usuario=useraux)
         aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
@@ -50,93 +80,116 @@ def showUserpage(request,nombre):
         for aparcSelect in aparclistSelect:
             if aparcSelect.aparcamiento.accesibilidad == 1:
                 aparclistAccSelect.append(aparcSelect)
-
-    except PaginaUsuario.DoesNotExist:
-        respuesta = "HAS INTRODUCIDO EL NOMBRE DEL USUARIO MAL O NO EXISTE."
-    if request.method == "POST":
-        print(request)
-    if request.method == "POST" and "tamaño" in request.POST and "color" in request.POST:
-        print("hola")  ##################################################PROCESAR CSS
-        return HttpResponseRedirect("/" + nombre)
-    if request.method == "POST" and "nuevotitulo" in request.POST:
-        print("hola1")
-        nuevotitulo = request.POST['nuevotitulo']
-        useraux = User.objects.get(username=request.user.username)
-        pageuser = PaginaUsuario.objects.get(usuario=useraux)
-        pageuser.titulo = nuevotitulo
-        pageuser.save()
-        return HttpResponseRedirect("/" + nombre)
-
-    c = RequestContext(request, {'globAcc':globAcc,
-                                 'aparclistSelect':aparclistSelect,
-                                 'aparclistAccSelect':aparclistAccSelect})
+        if request.method == "POST" and "tamaño" in request.POST and "color" in request.POST:
+            nuevocolor = request.POST['color']
+            nuevotamaño = request.POST['tamaño']
+            useraux = User.objects.get(username=request.user.username)
+            try:
+                Estilo.objects.get(usuario=useraux)
+                estilocss = Estilo.objects.get(usuario=request.user)
+                estilocss.tamano = nuevotamaño
+                estilocss.color = nuevocolor
+                estilocss.save()
+            except Estilo.DoesNotExist:
+                estilo = Estilo(usuario=useraux,tamano=nuevotamaño,color=nuevocolor)
+                estilo.save()
+            return HttpResponseRedirect("/" + nombre)
+        elif request.method == "POST" and "nuevotitulo" in request.POST:
+            nuevotitulo = request.POST['nuevotitulo']
+            useraux = User.objects.get(username=request.user.username)
+            pageuser = PaginaUsuario.objects.get(usuario=useraux)
+            pageuser.titulo = nuevotitulo
+            pageuser.save()
+            return HttpResponseRedirect("/" + nombre)
+        elif request.method == "POST":
+            start = start + 5
+            end = end + 5
+        elif request.method == "GET":
+            start = 0
+            end = 5
+            if len(aparclistSelect) > int(end) and  globAcc == False:
+                mostrarbutton = True
+            elif len(aparclistAccSelect) > int(end) and globAcc == True:
+                mostrarbutton = True
+        if len(aparclistAccSelect) != 0 and globAcc == True:
+            mostrar = True
+        elif len(aparclistSelect) != 0 and globAcc == False:
+            mostrar = True
+        if request.user.is_authenticated():
+            try:
+                estilocss = Estilo.objects.get(usuario=request.user)
+                c = RequestContext(request, {'globAcc':globAcc,
+                                             'mostrarbutton':mostrarbutton,
+                                             'mostrar':mostrar,
+                                             'estilo':estilocss,
+                                             'aparclistSelect':aparclistSelect[start:end],
+                                             'aparclistAccSelect':aparclistAccSelect[start:end]})
+            except Estilo.DoesNotExist:
+                c = RequestContext(request, {'globAcc':globAcc,
+                                             'mostrarbutton':mostrarbutton,
+                                             'mostrar':mostrar,
+                                             'aparclistSelect':aparclistSelect[start:end],
+                                             'aparclistAccSelect':aparclistAccSelect[start:end]})
+        else:
+            c = RequestContext(request, {'globAcc':globAcc,
+                                         'mostrarbutton':mostrarbutton,
+                                         'mostrar':mostrar,
+                                         'aparclistSelect':aparclistSelect[start:end],
+                                         'aparclistAccSelect':aparclistAccSelect[start:end]})
+    except (User.DoesNotExist,PaginaUsuario.DoesNotExist):
+        template = get_template('error.html')
+        c = RequestContext(request,{})
     return HttpResponse(template.render(c))
 
 @csrf_exempt
 def showAllParkings(request):
-    template = get_template('allAparcs.html')
-    aparclist = Aparcamiento.objects.all()
-    aparclistAcc = aparclist.filter(accesibilidad=1)
-    if request.method == "POST":
-        distritofilt = request.POST['distrito'].upper()
-        distritoaux = Distrito.objects.get(nombre=distritofilt)
-        aparclistFilt = aparclist.filter(distrito=distritoaux)
-        aparclistAccFilt = aparclistFilt.filter(accesibilidad=1)
-        c = RequestContext(request, {'globAcc':globAcc,
-                                     'aparclist':aparclistFilt,
-                                     'aparclistAcc':aparclistAccFilt})
-    elif request.method == "GET":
-        c = RequestContext(request, {'globAcc':globAcc,
-                                     'aparclist':aparclist,
-                                     'aparclistAcc':aparclistAcc})
+    try:
+        mostrar = False
+        template = get_template('allAparcs.html')
+        aparclist = Aparcamiento.objects.all()
+        aparclistAcc = aparclist.filter(accesibilidad=1)
+        distritolist = Distrito.objects.all()
+        if len(aparclistAcc) != 0 and globAcc == True:
+            mostrar = True
+        elif len(aparclist) != 0 and globAcc == False:
+            mostrar = True
+        if request.method == "GET":
+            if request.user.is_authenticated():
+                try:
+                    estilocss = Estilo.objects.get(usuario=request.user)
+                    c = RequestContext(request, {'globAcc':globAcc,
+                                                 'mostrar':mostrar,
+                                                 'estilo':estilocss,
+                                                 'aparclist':aparclist,
+                                                 'distritolist':distritolist,
+                                                 'aparclistAcc':aparclistAcc})
+                except Estilo.DoesNotExist:
+                    c = RequestContext(request, {'globAcc':globAcc,
+                                                 'mostrar':mostrar,
+                                                 'aparclist':aparclist,
+                                                 'distritolist':distritolist,
+                                                 'aparclistAcc':aparclistAcc})
+            else:
+                c = RequestContext(request, {'globAcc':globAcc,
+                                             'mostrar':mostrar,
+                                             'aparclist':aparclist,
+                                             'distritolist':distritolist,
+                                             'aparclistAcc':aparclistAcc})
+    except (User.DoesNotExist,PaginaUsuario.DoesNotExist):
+        template = get_template('error.html')
+        c = RequestContext(request,{})
 
     return HttpResponse(template.render(c))
 
 
 @csrf_exempt
 def showOneParking(request,identificador):
-    aparcaux = Aparcamiento.objects.get(id=identificador)
-    respuesta = "Nombre: " + aparcaux.nombre
-    direccion = aparcaux.clasevial + " " + aparcaux.nombrevia + " "
-    if aparcaux.numvia == None:
-        respuesta += "<br>Direccion: " + direccion + "S/N"
-    else:
-        respuesta += "<br>Direccion: " + direccion + aparcaux.numvia
-    respuesta += "<br><a href='" + aparcaux.link + "'>Pagina Oficial del aparcamiento</a>"
-    respuesta += "<br>Latitud: " + str(aparcaux.latitud) + " | Longitud: " + str(aparcaux.longitud)
-    respuesta += "<br>Descripcion: " + aparcaux.descripcion
-    respuesta += "<br>Distrito: " + aparcaux.distrito.nombre + " | Barrio: " + aparcaux.barrio
-    commentlist = Comentario.objects.all().filter(aparcamiento=aparcaux)
-    if  aparcaux.accesibilidad == 1:
-        respuesta += "<br>Accesibilidad: Plazas disponibles"
-    else:
-        respuesta += "<br>Accesibilidad: NO disponible"
-    if aparcaux.telefono == None or aparcaux.email == None:
-        respuesta += "<br>Datos de contacto: Sin datos de contacto"
-    else:
-        respuesta += "<br>Datos de contacto:"
-        respuesta += "<li>Telefono: " + aparcaux.telefono + "</li>"
-        respuesta += "<li>Email: " + aparcaux.email + "</li>"
-    respuesta += "<br>COMENTARIOS: " #text y aparcamiento
-    if len(commentlist) != 0:
-        for comment in commentlist:
-            respuesta +="</br>" + comment.text
-    if request.user.is_authenticated():
-        respuesta += "<br>ENHORABUENA ESTAS REGISTRADO como " + request.user.username
-        respuesta += "<br>Deja tu comentario sobre este aparcamiento: "
-        respuesta += '<form action="" method="POST">'
-        respuesta += 'Comentario: <input type="text" name="nuevocomentario">'
-        respuesta += '<input type="submit" value="Enviar Comentario" name="comentario"></form>'
-        respuesta += "<br>Selecciona este aparcamiento para que aparezca en tu pagina personal"
-        respuesta += '<form action="" method="POST">'
-        respuesta += '<br><input type="submit" value="Seleccionar aparcamiento" name="seleccionar"></form>'
-        if request.method == "POST" and request.POST.get("seleccionar", "") == 'Seleccionar aparcamiento':
-            pageuser = PaginaUsuario.objects.get(usuario=request.user)
-            select = AparcSelect(usuario=request.user,pagUsuario=pageuser,aparcamiento=aparcaux)
-            select.save()
-            return HttpResponseRedirect("/aparcamientos/" + identificador)
-        if request.method == "POST" and request.POST.get("comentario", "") == 'Enviar Comentario':
-            comment = request.POST['nuevocomentario']
+    try:
+        template = get_template('oneAparc.html')
+        aparcaux = Aparcamiento.objects.get(id=identificador)
+        commentlist = Comentario.objects.all().filter(aparcamiento=aparcaux)
+        if request.method == "POST" and "newcomment" in request.POST:
+            comment = request.POST['newcomment']
             nuevocomentario = Comentario(text=comment,aparcamiento=aparcaux)
             nuevocomentario.save()
             if aparcaux.numcomments == None:
@@ -145,19 +198,88 @@ def showOneParking(request,identificador):
                 aparcaux.numcomments = aparcaux.numcomments + 1
             aparcaux.save()
             return HttpResponseRedirect("/aparcamientos/" + identificador)
+        elif request.method == "POST":
+            pageuser = PaginaUsuario.objects.get(usuario=request.user)
+            select = AparcSelect(usuario=request.user,pagUsuario=pageuser,aparcamiento=aparcaux)
+            select.save()
+            return HttpResponseRedirect("/aparcamientos/" + identificador)
 
-    return HttpResponse(respuesta)
+        if request.user.is_authenticated():
+            try:
+                estilocss = Estilo.objects.get(usuario=request.user)
+                c = RequestContext(request, {'aparc':aparcaux,
+                                             'estilo':estilocss,
+                                             'commentlist':commentlist})
+            except Estilo.DoesNotExist:
+                c = RequestContext(request, {'aparc':aparcaux,
+                                             'commentlist':commentlist})
+        else:
+            c = RequestContext(request, {'aparc':aparcaux,
+                                         'commentlist':commentlist})
+    except (User.DoesNotExist,PaginaUsuario.DoesNotExist,Aparcamiento.DoesNotExist):
+        template = get_template('error.html')
+        c = RequestContext(request,{})
 
-# def userxml(request,nombre):
-#     return print("hola")
-#
-# def about(request):
-#     return print("hola")
+    return HttpResponse(template.render(c))
+
+@csrf_exempt
+def filtdistrito(request,nombredistr):
+    try:
+        template = get_template('allAparcs.html')
+        aparclist = Aparcamiento.objects.all()
+        aparclistAcc = aparclist.filter(accesibilidad=1)
+        distritolist = Distrito.objects.all()
+        distritoaux = Distrito.objects.get(nombre=nombredistr)
+        aparclistFilt = aparclist.filter(distrito=distritoaux)
+        aparclistAccFilt = aparclistFilt.filter(accesibilidad=1)
+        if request.user.is_authenticated():
+            try:
+                estilocss = Estilo.objects.get(usuario=request.user)
+                c = RequestContext(request, {'globAcc':globAcc,
+                                             'estilo':estilocss,
+                                             'aparclist':aparclistFilt,
+                                             'distritolist':distritolist,
+                                             'aparclistAcc':aparclistAccFilt})
+            except Estilo.DoesNotExist:
+                c = RequestContext(request, {'globAcc':globAcc,
+                                             'aparclist':aparclistFilt,
+                                             'distritolist':distritolist,
+                                             'aparclistAcc':aparclistAccFilt})
+        else:
+            c = RequestContext(request, {'globAcc':globAcc,
+                                         'aparclist':aparclistFilt,
+                                         'distritolist':distritolist,
+                                         'aparclistAcc':aparclistAccFilt})
+    except (User.DoesNotExist,PaginaUsuario.DoesNotExist,Distrito.DoesNotExist):
+        template = get_template('error.html')
+        c = RequestContext(request,{})
+
+    return HttpResponse(template.render(c))
+
+def userxml(request,nombre):
+    template = get_template('xmluser.html')
+    useraux = User.objects.get(username=nombre)
+    pageuser = PaginaUsuario.objects.get(usuario=useraux)
+    aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
+    c = RequestContext(request, {'aparclistSelect':aparclistSelect})
+    return HttpResponse(template.render(c), content_type="text/xml")
+
+def about(request):
+    template = get_template('about.html')
+    if request.user.is_authenticated():
+        try:
+            nuevoestilo = Estilo.objects.get(usuario=request.user)
+            c = RequestContext(request, {'estilo':nuevoestilo})
+        except Estilo.DoesNotExist:
+            c = RequestContext(request, {})
+    else:
+        c = RequestContext(request, {})
+
+    return HttpResponse(template.render(c))
 
 def login(request):
     if request.method == "POST":
         nombre = request.POST['nombre']
-        print(nombre)
         contraseña = request.POST['contra']
         usuario = authenticate(username=nombre, password=contraseña)
         if usuario != None:

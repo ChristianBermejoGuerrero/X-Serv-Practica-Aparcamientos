@@ -30,6 +30,11 @@ class PaginaUsuario (models.Model):
     usuario = models.OneToOneField(User,null=True, blank=True, default=None) #cada paginausuario solo puede ser de un usuario
     titulo = models.CharField(max_length=50,null=True, blank=True, default=None)
 
+class Estilo(models.Model):
+    usuario = models.OneToOneField(User,null=True, blank=True, default=None)
+    tamano = models.IntegerField(null=True, blank=True, default=None)
+    color = models.CharField(max_length=30,)
+
 class AparcSelect (models.Model):
     usuario = models.ForeignKey(User,null=True, blank=True, default=None)
     pagUsuario = models.ForeignKey(PaginaUsuario,null=True, blank=True, default=None)

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block style %}
+html,body,h1,h2,h3,h4,h5,h6 {
+  font-size: {{ estilo.tamano }}px;
+  background-color: {{ estilo.color }};
+}
+*{
+  font-size: {{ estilo.tamano }}px;
+  background-color: {{ estilo.color }};
+}
+{% endblock style %}
+
+{% block leftsidebar %}
+  <div class="w3-quarter w3-bar w3-bar-block w3-collapse w3-large w3-animate-left" style="z-index:2;width:195px;margin-top:70px;">
+    <h4 class="w3-bar-item"><b>Menu</b></h4>
+    {% for pageuser in pageuserlist %}
+      <a class="w3-bar-item w3-button w3-hover-black" href="/{{ pageuser.usuario.username }}">{{ pageuser.titulo }}</a>
+    {% endfor %}
+  </div>
+{% endblock leftsidebar %}
+
+{% block central %}
+  <div class="" style="margin-left:240px; margin-top:60px">
+    <div class="w3-twothird">
+      {% if mostrarbutton == True %}
+        <form class="w3-container" action="/uploadxml" method ="POST" style="margin-top:50px;margin-left:135px">
+          {% csrf_token %}
+          <h3><button class="w3-button w3-black">Cargar base de datos</button></h3>
+        </form>
+      {% endif %}
+      {% if globAcc == True %}
+        {% if mostrar == False %}
+            <h3 class="w3-text-teal">No hay ningún aparcamiento disponible con comentarios</h3>
+        {% else %}
+          <h1 class="w3-text-red">Aparcamientos disponibles más comentados</h1>
+          {% for aparcAccOrden in aparclistAccOrden %}
+            <h3 class="w3-text-teal">{{ aparcAccOrden.nombre }}</h3>
+            <h4 class="" style="margin-left:20px">Direccion: {{ aparcAccOrden.clasevial }} {{ aparcAccOrden.nombrevia }}, {{ aparcAccOrden.numvia }}</h4>
+            <h4><a class="" style="margin-left:20px" href="/aparcamientos/{{ aparcAccOrden.id }}">Más información</a></h4>
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        {% if mostrar == False %}
+          <h3 class="w3-text-teal" style="margin-left:20px">No hay ningún aparcamiento con comentarios</h3>
+        {% else %}
+          <h1 class="w3-text-red">Aparcamientos más comentados</h1>
+          {% for aparcOrden in aparclistOrden %}
+            <h3 class="w3-text-teal">{{ aparcOrden.nombre }}</h3>
+            <h4 class="" style="margin-left:20px">Direccion: {{ aparcOrden.clasevial }} {{ aparcOrden.nombrevia }}, {{ aparcOrden.numvia }}</h4>
+            <h4><a class="" style="margin-left:20px" href="/aparcamientos/{{ aparcOrden.id }}">Más información</a></h4>
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock central %}
+
+{% block rightsidebar %}
+{% endblock rightsidebar %}

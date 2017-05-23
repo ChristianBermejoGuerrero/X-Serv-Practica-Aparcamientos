@@ -1,0 +1,33 @@
+{% extends "principal.html" %}
+
+{% block rightsidebar %}
+  <div class="w3-quarter w3-right-align w3-container">
+    <div class="w3-padding-large w3-padding-32 w3-center">
+      {% if globAcc %}
+        {% if mostrar == False %}
+          <form class="w3-container" action="/" method ="POST" style="margin-top:30px;margin-left:805px">
+            {% csrf_token %}
+            <h3><button class="w3-button w3-black">Todos los aparcamientos</button></h3>
+          </form>
+        {% else %}
+          <form class="w3-container" action="/" method ="POST" style="margin-top:30px;margin-left:805px">
+            {% csrf_token %}
+            <h3><button class="w3-button w3-black">Todos los aparcamientos</button></h3>
+          </form>
+        {% endif %}
+      {% else %}
+        {% if mostrar == False %}
+          <form class="w3-container" action="/" method ="POST" style="margin-top:30px;margin-left:745px">
+            {% csrf_token %}
+            <h3><button class="w3-button w3-black">Sólo aparcamientos disponibles</button></h3>
+          </form>
+        {% else %}
+          <form class="w3-container" action="/" method ="POST" style="margin-top:30px;margin-left:-115px">
+            {% csrf_token %}
+            <h3><button class="w3-button w3-black">Sólo aparcamientos disponibles</button></h3>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock rightsidebar %}

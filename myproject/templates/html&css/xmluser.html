@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Contenidos>
+  <infoDataset>
+    <nombre>Aparcamientos seleccionados por {{ user.username }}</nombre>
+    <uri>http://localhost:1234/{{ user.username }}</uri>
+    <descripcion> Aparcamientos residentes P.A.R.  y aparcamientos públicos mixtos seleccionados por dicho usuario. </descripcion>
+  </infoDataset>
+  {% for aparc in aparclistSelect %}
+  <contenido>
+    <tipo>EntidadesYOrganismos</tipo>
+    <aparcamientos>
+      <atributos idioma="es">
+        <atributo nombre="NOMBRE">{{aparc.aparcamiento.nombre}}</atributo>
+        <atributo nombre="DESCRIPCION">
+        {{aparc.aparcamiento.descripcion}}
+        </atributo>
+        <atributo nombre="ACCESIBILIDAD">{{aparc.aparcamiento.accesbilidad}}</atributo>
+        <atributo nombre="CONTENT-URL">
+        {{aparc.aparcamiento.link}}
+        </atributo>
+        <atributo nombre="LOCALIZACION">
+          <atributo nombre="NOMBRE-VIA">{{aparc.nombrevia}}</atributo>
+          <atributo nombre="CLASE-VIAL">{{aparc.clasevial}}</atributo>
+          <atributo nombre="NUM">{{aparc.numvia}}</atributo>
+          <atributo nombre="LOCALIDAD">MADRID</atributo>
+          <atributo nombre="PROVINCIA">MADRID</atributo>
+          <atributo nombre="BARRIO">{{aparc.barrio}}</atributo>
+          <atributo nombre="DISTRITO">{{aparc.distrito}}</atributo>
+          <atributo nombre="LATITUD">{{aparc.latitud}}</atributo>
+          <atributo nombre="LONGITUD">{{aparc.longitud}}</atributo>
+        </atributo>
+        <atributo nombre="DATOSCONTACTOS">
+          <atributo nombre="TELEFONO">{{aparc.telefono}}</atributo>
+          <atributo nombre="EMAIL">{{aparc.email}}</atributo>
+        </atributo>
+        <atributo nombre="TIPO">/contenido/entidadesYorganismos/AparcamientosResidentes</atributo>
+      </atributos>
+    </aparcamientos>
+  </contenido>
+  {% endfor %}
+</Contenidos>
