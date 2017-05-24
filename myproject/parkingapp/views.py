@@ -77,21 +77,23 @@ def showUserpage(request,nombre):
         pageuser = PaginaUsuario.objects.get(usuario=useraux)
         aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
         aparclistAccSelect = []
-        for aparcSelect in aparclistSelect:
-            if aparcSelect.aparcamiento.accesibilidad == 1:
-                aparclistAccSelect.append(aparcSelect)
-        if request.method == "POST" and "tamaño" in request.POST and "color" in request.POST:
+        print(len(aparclistSelect))
+        if len(aparclistSelect) != 0:
+            for aparcSelect in aparclistSelect:
+                if aparcSelect.aparcamiento.accesibilidad == 1:
+                    aparclistAccSelect.append(aparcSelect)
+        if request.method == "POST" and "tamano" in request.POST and "color" in request.POST:
             nuevocolor = request.POST['color']
-            nuevotamaño = request.POST['tamaño']
+            nuevotamano = request.POST['tamano']
             useraux = User.objects.get(username=request.user.username)
             try:
                 Estilo.objects.get(usuario=useraux)
                 estilocss = Estilo.objects.get(usuario=request.user)
-                estilocss.tamano = nuevotamaño
+                estilocss.tamano = nuevotamano
                 estilocss.color = nuevocolor
                 estilocss.save()
             except Estilo.DoesNotExist:
-                estilo = Estilo(usuario=useraux,tamano=nuevotamaño,color=nuevocolor)
+                estilo = Estilo(usuario=useraux,tamano=nuevotamano,color=nuevocolor)
                 estilo.save()
             return HttpResponseRedirect("/" + nombre)
         elif request.method == "POST" and "nuevotitulo" in request.POST:
@@ -122,18 +124,21 @@ def showUserpage(request,nombre):
                                              'mostrarbutton':mostrarbutton,
                                              'mostrar':mostrar,
                                              'estilo':estilocss,
+                                             'paginausuario':pageuser,
                                              'aparclistSelect':aparclistSelect[start:end],
                                              'aparclistAccSelect':aparclistAccSelect[start:end]})
             except Estilo.DoesNotExist:
                 c = RequestContext(request, {'globAcc':globAcc,
                                              'mostrarbutton':mostrarbutton,
                                              'mostrar':mostrar,
+                                             'paginausuario':pageuser,
                                              'aparclistSelect':aparclistSelect[start:end],
                                              'aparclistAccSelect':aparclistAccSelect[start:end]})
         else:
             c = RequestContext(request, {'globAcc':globAcc,
                                          'mostrarbutton':mostrarbutton,
                                          'mostrar':mostrar,
+                                         'paginausuario':pageuser,
                                          'aparclistSelect':aparclistSelect[start:end],
                                          'aparclistAccSelect':aparclistAccSelect[start:end]})
     except (User.DoesNotExist,PaginaUsuario.DoesNotExist):
@@ -200,8 +205,11 @@ def showOneParking(request,identificador):
             return HttpResponseRedirect("/aparcamientos/" + identificador)
         elif request.method == "POST":
             pageuser = PaginaUsuario.objects.get(usuario=request.user)
-            select = AparcSelect(usuario=request.user,pagUsuario=pageuser,aparcamiento=aparcaux)
-            select.save()
+            try:
+                select = AparcSelect.objects.get(aparcamiento=aparcaux)
+            except AparcSelect.DoesNotExist:
+                select = AparcSelect(usuario=request.user,pagUsuario=pageuser,aparcamiento=aparcaux)
+                select.save()
             return HttpResponseRedirect("/aparcamientos/" + identificador)
 
         if request.user.is_authenticated():
@@ -280,8 +288,8 @@ def about(request):
 def login(request):
     if request.method == "POST":
         nombre = request.POST['nombre']
-        contraseña = request.POST['contra']
-        usuario = authenticate(username=nombre, password=contraseña)
+        contrasena = request.POST['contra']
+        usuario = authenticate(username=nombre, password=contrasena)
         if usuario != None:
             if usuario.is_active:
                 auth_login(request, usuario)

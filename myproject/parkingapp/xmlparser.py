@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from parkingapp.bs4 import BeautifulSoup
 from parkingapp.models import Aparcamiento
 from parkingapp.models import Distrito
 import urllib.request

@@ -1,14 +1,9 @@
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
-
 from collections import defaultdict
 import itertools
 import sys
-from bs4.element import (
+from parkingapp.bs4.element import (
     CharsetMetaAttributeValue,
     ContentMetaAttributeValue,
-    HTMLAwareEntitySubstitution,
-    whitespace_re
     )
 
 __all__ = [
@@ -231,14 +226,9 @@ class HTMLTreeBuilder(TreeBuilder):
     Such as which tags are empty-element tags.
     """
 
-    preserve_whitespace_tags = HTMLAwareEntitySubstitution.preserve_whitespace_tags
-    empty_element_tags = set([
-        # These are from HTML5.
-        'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr',
-
-        # These are from HTML4, removed in HTML5.
-        'spacer', 'frame'
-    ])
+    preserve_whitespace_tags = set(['pre', 'textarea'])
+    empty_element_tags = set(['br' , 'hr', 'input', 'img', 'meta',
+                              'spacer', 'link', 'frame', 'base'])
 
     # The HTML standard defines these attributes as containing a
     # space-separated list of values, not a single value. That is,
@@ -300,7 +290,7 @@ class HTMLTreeBuilder(TreeBuilder):
 def register_treebuilders_from(module):
     """Copy TreeBuilders from the given module into this module."""
     # I'm fairly sure this is not the best way to do this.
-    this_module = sys.modules['bs4.builder']
+    this_module = sys.modules['parkingapp.bs4.builder']
     for name in module.__all__:
         obj = getattr(module, name)
 
