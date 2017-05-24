@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 
+{% block style %}
+html,body,h1,h2,h3,h4,h5,h6 {
+  font-size: {{ estilo.tamano }}px;
+}
+body{
+  {% if estilo %}
+    background-color: {{ estilo.color }};
+  {% else %}
+    background-image: url("https://inspirationhut.net/wp-content/uploads/2013/05/201.png");
+  {% endif %}
+}
+{% endblock style %}
+
 {% block central %}
 <div class="" style="margin-left:190px;margin-top:40px">
   <div class="w3-twothird" style= "margin-left:-85px">
   <h2>Autor: Christian Bermejo Guerrero</h2>
   <h2>Grado: Ingeniería en Tecnologías de la Telecomunicación</h2>
   <h2>Email: c.bermejog@alumnos.urjc.es</h2><br>
-  <h2>Funcionamiento de la web</h2>
+  <h2>Información sobre la web</h2>
   <h3>Recurso /</h3>
   <p class="" style= "margin-left:15px">Página principal de la práctica. Muestra un listado de los cinco
   aparcamientos con más comentarios. En la parte izquierda, se encuentra un listado

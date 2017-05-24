@@ -3,11 +3,13 @@
 {% block style %}
 html,body,h1,h2,h3,h4,h5,h6 {
   font-size: {{ estilo.tamano }}px;
-  background-color: {{ estilo.color }};
 }
-*{
-  font-size: {{ estilo.tamano }}px;
-  background-color: {{ estilo.color }};
+body{
+  {% if estilo %}
+    background-color: {{ estilo.color }};
+  {% else %}
+    background-image: url("https://inspirationhut.net/wp-content/uploads/2013/05/201.png");
+  {% endif %}
 }
 {% endblock style %}
 
@@ -16,7 +18,7 @@ html,body,h1,h2,h3,h4,h5,h6 {
   <div class="w3-dropdown-hover">
     <button class="w3-button w3-black">Selecciona distrito deseado</button>
     <div class="w3-dropdown-content w3-bar-block w3-card-2 w3-light-grey" id="myDIV">
-      <input class="w3-input w3-padding" type="text" placeholder="Buscar..." id="myInput" onkeyup="myFunction()">
+      <input class="w3-input w3-padding" type="text" placeholder="Buscar..." id="myInput" onkeyup="myFunctionfiltro()">
       {% for distrito in distritolist %}
         <a class="w3-bar-item w3-button" href="/aparcamientos/distrito/{{ distrito.nombre }}">{{ distrito.nombre }}</a>
       {% endfor %}
@@ -26,7 +28,7 @@ html,body,h1,h2,h3,h4,h5,h6 {
 
 <script>
 // Filter
-function myFunction() {
+function myFunctionfiltro() {
     var input, filter, ul, li, a, i;
     input = document.getElementById("myInput");
     filter = input.value.toUpperCase();

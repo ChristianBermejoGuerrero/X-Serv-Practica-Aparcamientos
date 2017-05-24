@@ -3,25 +3,27 @@
 {% block style %}
 html,body,h1,h2,h3,h4,h5,h6 {
   font-size: {{ estilo.tamano }}px;
-  background-color: {{ estilo.color }};
 }
-*{
-  font-size: {{ estilo.tamano }}px;
-  background-color: {{ estilo.color }};
+body{
+  {% if estilo %}
+    background-color: {{ estilo.color }};
+  {% else %}
+    background-image: url("https://inspirationhut.net/wp-content/uploads/2013/05/201.png");
+  {% endif %}
 }
 {% endblock style %}
 
 {% block leftsidebar %}
-  <div class="w3-quarter w3-bar w3-bar-block w3-collapse w3-large w3-animate-left" style="width:225px;margin-top:70px;">
+  <div class="w3-quarter w3-bar w3-bar-block w3-collapse w3-large w3-animate-left" style="width:225px;margin-top:80px;">
     <h4 class="w3-bar-item"><b>Páginas de usuario</b></h4>
     {% for pageuser in pageuserlist %}
-      <a class="w3-bar-item w3-button w3-hover-black" style="z-index:2;width:205px" href="/{{ pageuser.usuario.username }}">{{ pageuser.titulo }}</a>
+      <a class="w3-bar-item w3-button w3-hover-black" style="z-index:2;width:205px" href="/{{ pageuser.usuario.username }}">{{ pageuser.titulo }} ({{pageuser.usuario.username}})</a>
     {% endfor %}
   </div>
 {% endblock leftsidebar %}
 
 {% block central %}
-  <div class="" style="margin-left:240px; margin-top:60px">
+  <div class="" style="margin-left:250px; margin-top:80px">
     <div class="w3-twothird">
       {% if mostrarbutton == True %}
         <form class="w3-container" action="/uploadxml" method ="POST" style="margin-top:50px;margin-left:135px">
@@ -31,9 +33,9 @@ html,body,h1,h2,h3,h4,h5,h6 {
       {% endif %}
       {% if globAcc == True %}
         {% if mostrar == False %}
-            <h3 class="w3-text-teal">No hay ningún aparcamiento disponible con comentarios</h3>
+            <h2 class="w3-text-teal" style="">No hay ningún aparcamiento disponible con comentarios</h3>
         {% else %}
-          <h1 class="w3-text-red">Aparcamientos disponibles más comentados</h1>
+          <h1 class=" w3-text-red">Aparcamientos disponibles más comentados</h1>
           {% for aparcAccOrden in aparclistAccOrden %}
             <h3 class="w3-text-teal">{{ aparcAccOrden.nombre }}</h3>
             <h4 class="" style="margin-left:20px">Direccion: {{ aparcAccOrden.clasevial }} {{ aparcAccOrden.nombrevia }}, {{ aparcAccOrden.numvia }}</h4>
@@ -42,7 +44,7 @@ html,body,h1,h2,h3,h4,h5,h6 {
         {% endif %}
       {% else %}
         {% if mostrar == False %}
-          <h3 class="w3-text-teal" style="margin-left:20px">No hay ningún aparcamiento con comentarios</h3>
+          <h2 class="w3-text-teal" style="margin-left:20px">No hay ningún aparcamiento con comentarios</h3>
         {% else %}
           <h1 class="w3-text-red">Aparcamientos más comentados</h1>
           {% for aparcOrden in aparclistOrden %}

@@ -3,11 +3,13 @@
 {% block style %}
 html,body,h1,h2,h3,h4,h5,h6 {
   font-size: {{ estilo.tamano }}px;
-  background-color: {{ estilo.color }};
 }
-*{
-  font-size: {{ estilo.tamano }}px;
-  background-color: {{ estilo.color }};
+body{
+  {% if estilo %}
+    background-color: {{ estilo.color }};
+  {% else %}
+    background-image: url("https://inspirationhut.net/wp-content/uploads/2013/05/201.png");
+  {% endif %}
 }
 {% endblock style %}
 
@@ -36,16 +38,17 @@ html,body,h1,h2,h3,h4,h5,h6 {
       {% else %}
         <h4 class="" style="margin-left:40px"><b>Email</b>: {{ aparc.email }}</h4>
       {% endif %}
+      <h4 class="" style="margin-left:40px"><b>Votos positivos</b>: {{ aparc.nummegusta }} </h4>
       {% if user.is_authenticated %}
         <div class="" style="margin-top:20px">
           <form class="w3-container" action="/aparcamientos/{{ aparc.id }}" method ="POST">
             <h3><p><label class="w3-text-brown"><b>Deja tu comentario:</b></label></h3></p>
             <p><input class="w3-input w3-border w3-sand" style="margin-left:20px;height: 60px" type="text" name="newcomment" maxlength="66" placeholder="Escribe aquí...(Límite 65 caracteres)"></p>
-            <p><button class="w3-btn w3-brown" style="margin-left:830px">Enviar</button></p>
+            <p><button class="w3-btn w3-brown" style="margin-left:790px">Enviar</button></p>
           </form>
         </div>
-        <h3 class="w3-text-teal" style="margin-top:20px;margin-left:10px">Comentarios sobre este aparcamiento:</h3>
       {% endif %}
+      <h3 class="w3-text-teal" style="margin-top:20px;margin-left:10px">Comentarios sobre este aparcamiento:</h3>
       {% for comment in commentlist %}
         <p><h4 class="w3-panel w3-card w3-khaki w3-padding-large w3-padding-32 w3-round-large" style="margin-left:20px;margin-right:-20px">{{ comment.text }}</h4></p>
       {% endfor %}
@@ -55,13 +58,32 @@ html,body,h1,h2,h3,h4,h5,h6 {
 
 {% block rightsidebar %}
 {% if user.is_authenticated %}
+  {% if mostrarbutton == True %}
     <div class="w3-quarter w3-right-align w3-container">
       <div class="w3-padding-large w3-padding-32 w3-center">
-          <form class="w3-container" action="/aparcamientos/{{ aparc.id }}" method ="POST" style="margin-top:30px;margin-left:-25px">
+          <form class="w3-container" action="/aparcamientos/{{ aparc.id }}" method ="POST" style="margin-top:30px;margin-left:-30px">
             {% csrf_token %}
-            <h3><button class="w3-button w3-black">Seleccionar aparcamiento</button></h3>
+            <h3><button class="w3-button w3-black">Marca este aparcamiento</button></h3>
+          </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="w3-quarter w3-right-align w3-container">
+      <div class="w3-padding-large w3-padding-32 w3-center">
+          <form class="w3-container" action="/aparcamientos/{{ aparc.id }}" method ="POST" style="margin-top:30px;margin-left:-40px">
+            {% csrf_token %}
+            <h3><button class="w3-button w3-black">Desmarca este aparcamiento</button></h3>
           </form>
       </div>
     </div>
   {% endif %}
+{% endif %}
+  <div class="w3-quarter w3-right-align w3-container">
+    <div class="w3-padding-large w3-padding-32 w3-center">
+        <form class="w3-container" action="/aparcamientos/valoraciones/{{ aparc.id }}" method ="POST" style="margin-top:0px;margin-left:-590px">
+          {% csrf_token %}
+          <h3><button class="w3-button w3-green w3-round-xxlarge">Me gusta</button></h3>
+        </form>
+    </div>
+  </div>
 {% endblock rightsidebar %}

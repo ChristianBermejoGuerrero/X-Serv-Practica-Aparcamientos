@@ -22,7 +22,11 @@ from django.contrib.auth.views import login, logout
 urlpatterns = [
     url(r'^$', views.showPrincipal, name='pagina principal'),
     url(r'^aparcamientos$', views.showAllParkings, name='pagina todos los aparcamientos'),
+    url(r'^xml$', views.xmlprincipal, name='canal xml con los aparcamientos mas comentados'),
+    url(r'^rss$', views.rsschannel, name='canal rss con todos los comentarios'),
+    url(r'^json/(.+)$', views.jsonchannel, name='canal json con los aparcamientos seleccionados por un usuario'),
     url(r'^aparcamientos/distrito/(.+)$', views.filtdistrito, name='filtrar por distrito'),
+    url(r'^aparcamientos/valoraciones/(.+)$', views.valoraciones, name='conteo de positivos de un aparc'),
     url(r'^aparcamientos/(.+)$', views.showOneParking, name='pagina de un aparcamiento con su informacion'),
     url(r'^(.+)/xml$', views.userxml, name='canal xml de aparcamientos seleccionados por ese usuario'),
     url(r'^about$', views.about, name='pagina de informacion HTML, autoria y funcionamiento'),

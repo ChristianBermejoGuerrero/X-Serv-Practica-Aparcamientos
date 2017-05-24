@@ -1,0 +1,32 @@
+{
+    "aparcamientos": {
+      "informacion": "Aparcamientos seleccionados por {{ user.username }}",
+      {% for aparc in aparclistSelect %}
+        "aparcamiento":{
+    			"NOMBRE": "{{ aparc.aparcamiento.nombre }}",
+    			"DESCRIPCION": "{{ aparc.aparcamiento.descripcion }}",
+    			"ACCESIBILIDAD": "{{ aparc.aparcamiento.accesibilidad }}",
+    			"CONTENT-URL": "{{ aparc.aparcamiento.link }}",
+    			"LOCALIZACION": {
+    				"NOMBRE-VIA": "{{ aparc.aparcamiento.nombrevia }}",
+    				"CLASE-VIAL": "{{ aparc.aparcamiento.clasevial }}",
+    				"NUM": "{{ aparc.aparcamiento.numvia }}",
+    				"LOCALIDAD": "MADRID",
+    				"PROVINCIA": "MADRID",
+    				"BARRIO": "{{ aparc.aparcamiento.barrio }}",
+    				"DISTRITO": "{{ aparc.aparcamiento.distrito }}",
+    				"LATITUD": "{{ aparc.aparcamiento.latitud }}",
+    				"LONGITUD": "{{ aparc.aparcamiento.longitud }}"
+  			     },
+    			"DATOSCONTACTOS": {
+    				"TELEFONO": "{{ aparc.aparcamiento.telefono }}",
+    				"EMAIL": "{{ aparc.aparcamiento.email }}",
+			     },
+           "VALORACIONES": {
+     				"NUMERO-COMENTARIOS": "{{ aparc.aparcamiento.numcomments }}",
+     				"VOTOS-POSITIVOS": "{{ aparc.aparcamiento.nummegusta }}",
+ 			     },
+        }
+      {% endfor %}
+    }
+}

@@ -9,31 +9,32 @@
   <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Allerta+Stencil">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fredoka+One">
   <link rel="shortcut icon" type="image/png" href="https://lh3.googleusercontent.com/yLsosp6AXVSZDMrDVRda3O9XZ5fZlxsdzNYINE0AE03jLzIxcfuEuIW0VF3lf_lO2ftG=w300"/>
   <style>
     html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
-    body {
-      background-image: url("https://inspirationhut.net/wp-content/uploads/2013/05/201.png");
-    }
+    {% block style %}
+    {% endblock style %}
     .mySlides {display:none}
     .w3-left, .w3-right, .w3-badge {cursor:pointer}
     .w3-badge {height:13px;width:13px;padding:0}
-    {% block style %}
-    {% endblock style%}
     .w3-allerta {
       font-family: "Allerta Stencil", Sans-serif;
+    }
+    .w3-fredoka {
+      font-family: "Fredoka One",cursive;
     }
   </style>
 
   <body>
 
-<div class="w3-content w3-display-container" style="min-height:350px;max-height:400px;min-width:1420px;max-width=1420">
+<div class="w3-content w3-display-container" style="min-height:350px;max-height:400px;min-width:1320px;max-width=1320">
   <img class="mySlides" src="http://www.santos2013.es/ImagenFondo05.jpg" style="width:100%;min-height:380px;max-height:420px;min-width:1420px;max-width=1420">
     <div class="w3-display-middle">
-      <h1 class="w3-xxxlarge w3-animate-top w3-text-white">Encuentra parking en Madrid</h1>
+      <h1 class="w3-xxxlarge w3-animate-top w3-text-white w3-fredoka">Busca parking en Madrid</h1>
       <hr class="w3-border-white" style="margin:auto;width:70%">
     </div>
-  <img class="mySlides" src="http://a1.odistatic.net/images/landingpages/vacation/1920x800/madrid_1920x800.jpg" style="width:100%;min-height:380px;max-height:420px;min-width:1420px;max-width=1420">
+  <img class="mySlides" src="http://www.elitcars.com/wp-content/uploads/2015/03/madrid_elitcars_21.jpg" style="width:100%;min-height:380px;max-height:420px;min-width:1420px;max-width=1420">
   <img class="mySlides" src="http://www.zastavki.com/pictures/1920x1080/2014/World___Spain_Arc_de_Triomphe_in_Madrid_058599_23.jpg" style="width:100%;min-height:380px;max-height:420px;min-width:1420px;max-width=1420">
   <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
     <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
@@ -54,54 +55,50 @@
         </a>
         <a href="/" class="w3-bar-item w3-button w3-text-red w3-large w3-theme-l1"><b>HOME</b></a>
         <a href="/aparcamientos" class="w3-bar-item w3-button w3-text-red w3-large"><i class="fa fa-user"></i><b>TODOS</b></a>
-        <a href="/about" class="w3-bar-item w3-button w3-text-red w3-large"><i class="fa fa-th"><b></i>ABOUT</b></a>
+        <a href="/about" class="w3-bar-item w3-button w3-text-red w3-large"><i class="fa fa-th"></i><b>ABOUT</b></a>
           <i class="fa fa-search"></i>
-        </a>
       </div>
     </div>
 
-    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
-    <div class="w3-container ">
-    <!-- bar -->
-
+    <div class="w3-container">
       {% block leftsidebar %}
       {% endblock leftsidebar %}
 
       {% block central %}
       {% endblock central %}
-      <div class="w3-quarter w3-container">
-      	<div class="w3-border w3-padding-large w3-padding-32 w3-center " style="margin-top:80px;margin-left:10px;margin-right:-10px">
+      <div class="w3-quarter w3-container estilocss">
+      	<div class="w3-border w3-padding-large w3-padding-32 w3-center estilocss" style="margin-top:80px;margin-left:10px;margin-right:-10px">
           <div>
             {% if user.is_authenticated %}
               <h3>Identificado como:</h3>
-                <p class="w3-xlarge" style="margin-top:10px;"><i>{{ user.username }}</i></p>
-                  <form class="w3-container" action="/logout" method ="POST">
+                <p class="w3-xlarge estilocss" style="margin-top:10px;"><i>{{ user.username }}</i></p>
+                  <form class="w3-container estilocss" action="/logout" method ="POST">
                   {% csrf_token %}
                     <button class="w3-button w3-black" style="margin-top:0px">Logout</button>
                 </form>
             {% else %}
-              <form class="w3-container" style="" action="/login" method ="POST">
+              <form class="w3-container estilocss" style="" action="/login" method ="POST">
                 {% csrf_token %}
                 <h3>Identifícate</h3>
-                <p><input class="w3-input" type="text" name="nombre" placeholder="Nombre"></p>
-                <p><input class="w3-input" type="password" name="contra" placeholder="Contraseña"></p>
+                <p><input class="w3-input estilocss" type="text" name="nombre" placeholder="Nombre"></p>
+                <p><input class="w3-input estilocss" type="password" name="contra" placeholder="Contraseña"></p>
                 <button class="w3-button w3-black" style="margin-top:10px;">Login</button>
               </form>
             {% endif %}
-          </div>
       	</div>
       </div>
       {% block rightsidebar %}
       {% endblock rightsidebar %}
     </div>
+    </div>
 
     <footer>
       <div class="w3-container w3-theme-l2 w3-padding-16" style="margin-top:30px">
-        <p><h4>Esta aplicación utiliza datos del portal de datos abiertos de la ciudad de Madrid. <a href="http://datos.munimadrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=202584-0-aparcamientos-residentes&mgmtid=e84276ac109d3410VgnVCM2000000c205a0aRCRD&preview=full">Enlace aquí.</a></p>
-        <p><h4> </h4></p>
+        <p><h4>Esta aplicación utiliza datos del portal de datos abiertos de la ciudad de Madrid. <a href="http://datos.munimadrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=202584-0-aparcamientos-residentes&mgmtid=e84276ac109d3410VgnVCM2000000c205a0aRCRD&preview=full">
+          Pinche aquí.</h4></a><h4>La descripción de dichos datos se encuentra en el siguiente enlace. <a href="http://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=e84276ac109d3410VgnVCM2000000c205a0aRCRD&vgnextchannel=374512b9ace9f310VgnVCM100000171f5a0aRCRD&vgnextfmt=default">Pinche aquí</h4></a></p>
       </div>
       <div class="w3-container w3-theme-l1">
-        <p><h5>Autor: Christian Bermejo Guerrero | cbermejog7@gmail.com |</a></p>
+        <p><h5>Autor: Christian Bermejo Guerrero | cbermejog7@gmail.com |</h5></p>
       </div>
     </footer>
 
@@ -152,6 +149,7 @@
       x[slideIndex-1].style.display = "block";
       dots[slideIndex-1].className += " w3-white";
     }
+    
     </script>
 
   </body>

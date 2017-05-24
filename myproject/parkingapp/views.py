@@ -23,7 +23,7 @@ def showPrincipal(request):
     pageuserlist = PaginaUsuario.objects.all()
     if len(userlist) != len(pageuserlist):
         for user in userlist:
-            paginausuario = PaginaUsuario(usuario=user,titulo=("Pagina de " + user.username))
+            paginausuario = PaginaUsuario(usuario=user,titulo=("Página de " + user.username))
             paginausuario.save()
     pageuserlist = PaginaUsuario.objects.all()
     aparclist = Aparcamiento.objects.all()
@@ -207,6 +207,7 @@ def showOneParking(request,identificador):
             pageuser = PaginaUsuario.objects.get(usuario=request.user)
             try:
                 select = AparcSelect.objects.get(aparcamiento=aparcaux)
+                select.delete()
             except AparcSelect.DoesNotExist:
                 select = AparcSelect(usuario=request.user,pagUsuario=pageuser,aparcamiento=aparcaux)
                 select.save()
@@ -214,12 +215,19 @@ def showOneParking(request,identificador):
 
         if request.user.is_authenticated():
             try:
+                select = AparcSelect.objects.get(aparcamiento=aparcaux)
+                mostrarbutton = False
+            except AparcSelect.DoesNotExist:
+                mostrarbutton = True
+            try:
                 estilocss = Estilo.objects.get(usuario=request.user)
                 c = RequestContext(request, {'aparc':aparcaux,
+                                             'mostrarbutton':mostrarbutton,
                                              'estilo':estilocss,
                                              'commentlist':commentlist})
             except Estilo.DoesNotExist:
                 c = RequestContext(request, {'aparc':aparcaux,
+                                             'mostrarbutton':mostrarbutton,
                                              'commentlist':commentlist})
         else:
             c = RequestContext(request, {'aparc':aparcaux,
@@ -265,11 +273,34 @@ def filtdistrito(request,nombredistr):
     return HttpResponse(template.render(c))
 
 def userxml(request,nombre):
-    template = get_template('xmluser.html')
-    useraux = User.objects.get(username=nombre)
-    pageuser = PaginaUsuario.objects.get(usuario=useraux)
-    aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
-    c = RequestContext(request, {'aparclistSelect':aparclistSelect})
+    template = get_template('xmluser.xml')
+    try:
+        useraux = User.objects.get(username=nombre)
+        pageuser = PaginaUsuario.objects.get(usuario=useraux)
+        aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
+        c = RequestContext(request, {'aparclistSelect':aparclistSelect})
+    except (User.DoesNotExist,PaginaUsuario.DoesNotExist):
+        template = get_template('error.html')
+        c = RequestContext(request,{})
+    return HttpResponse(template.render(c), content_type="text/xml")
+
+def jsonchannel(request,nombre):
+    template = get_template('jsonchannel.json')
+    try:
+        useraux = User.objects.get(username=nombre)
+        pageuser = PaginaUsuario.objects.get(usuario=useraux)
+        aparclistSelect = AparcSelect.objects.all().filter(pagUsuario=pageuser)
+        c = RequestContext(request, {'aparclistSelect':aparclistSelect})
+    except (User.DoesNotExist,PaginaUsuario.DoesNotExist):
+        template = get_template('error.html')
+        c = RequestContext(request,{})
+    return HttpResponse(template.render(c), content_type="text/json")
+
+def xmlprincipal(request):
+    template = get_template('xmlprincipal.xml')
+    aparclist = Aparcamiento.objects.all()
+    aparclistOrden = aparclist.exclude(numcomments=0).order_by('numcomments').reverse()[:5]
+    c = RequestContext(request,{'aparclist':aparclistOrden})
     return HttpResponse(template.render(c), content_type="text/xml")
 
 def about(request):
@@ -303,3 +334,20 @@ def uploadxml(request):
     #falta poner boton en la pagina principal para cargar los aparcamientos la primera vez
     update()
     return redirect('/')
+
+def valoraciones(request,identificador):
+    aparcaux = Aparcamiento.objects.get(id=identificador)
+    if aparcaux.nummegusta == None:
+        aparcaux.nummegusta = 1
+    else:
+        aparcaux.nummegusta = aparcaux.nummegusta + 1
+    aparcaux.save()
+    print(str(aparcaux.nummegusta))
+    return HttpResponseRedirect("/aparcamientos/" + identificador)
+
+def rsschannel(request):
+    template = get_template('rsscomment.rss')
+    commentlist = Comentario.objects.all()
+    c = RequestContext(request, {'commentlist':commentlist})
+
+    return HttpResponse(template.render(c))
