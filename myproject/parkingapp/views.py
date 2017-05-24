@@ -189,6 +189,7 @@ def showAllParkings(request):
 
 @csrf_exempt
 def showOneParking(request,identificador):
+    mostrarbutton = True
     try:
         template = get_template('oneAparc.html')
         aparcaux = Aparcamiento.objects.get(id=identificador)
@@ -203,19 +204,20 @@ def showOneParking(request,identificador):
                 aparcaux.numcomments = aparcaux.numcomments + 1
             aparcaux.save()
             return HttpResponseRedirect("/aparcamientos/" + identificador)
-        elif request.method == "POST":
+        elif request.method == "POST": #si recibimos post es que esta registrado
             pageuser = PaginaUsuario.objects.get(usuario=request.user)
             try:
-                select = AparcSelect.objects.get(aparcamiento=aparcaux)
+                select = AparcSelect.objects.get(aparcamiento=aparcaux,pagUsuario=pageuser)
                 select.delete()
             except AparcSelect.DoesNotExist:
                 select = AparcSelect(usuario=request.user,pagUsuario=pageuser,aparcamiento=aparcaux)
                 select.save()
+
             return HttpResponseRedirect("/aparcamientos/" + identificador)
 
         if request.user.is_authenticated():
             try:
-                select = AparcSelect.objects.get(aparcamiento=aparcaux)
+                select = AparcSelect.objects.get(aparcamiento=aparcaux,usuario=request.user)
                 mostrarbutton = False
             except AparcSelect.DoesNotExist:
                 mostrarbutton = True
